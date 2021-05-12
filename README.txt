@@ -1,5 +1,5 @@
-개발자 티셔츠 쇼핑몰 오픈소스 짱
+Open Makers Source Code
 
-개발자 목록
-1. 고양이
-2. 문어
+-관리: 버전별 리스트 관리 필요
+-대상: Raspberry Pi Device 
+-언어: C, Java
