@@ -1,0 +1,68 @@
+/** 
+ *  Copyright (c) 2018 KT Corp. All rights reserved.
+ *
+ *  This is a proprietary software of KT corp, and you may not use this file except in
+ *  compliance with license agreement with KT corp. Any redistribution or use of this
+ *  software, with or without modification shall be strictly prohibited without prior written
+ *  approval of KT corp, and the copyright notice above does not evidence any actual or
+ *  intended publication of such software.
+ *
+ */
+
+#include <stdio.h>
+#include "kt_iot_log.h"
+#include "client/client.h"
+
+/** 
+ *   @brief  on_411_response_arrived
+ */  
+static void on_411_response_arrived(im_client_tPtr cli, IMPacketPtr res)
+{
+  unsigned long long trx_id = im_head_get_trmTransacId(&res->head) ;
+  //
+  DBG("trx_id[%lld]", im_head_get_trmTransacId(&res->head));
+  DBG("respCd[%s]", im_body411_res_get_respCd(&res->body));
+}
+
+
+/** 
+ *   @brief  example_if411_send_data_with_deviceid  
+ */  
+int example_if411_send_data_with_deviceid(im_client_tPtr cli)
+{
+  IMPacket req;
+
+  int rc = im_packet411_req_init(&req, cli->commChAthnNo);
+  if ( rc < 0 )    {
+    ERR("im_packet411_req_init()");
+    return -1;
+  }
+
+  im_body411_req_set_extrSysId(&req.body, cli->svc_gw);
+
+  char *dev_id = "sub_device";
+  im_body411_req_append_devColecData(&req.body, dev_id);
+
+  im_body411_req_append_colecRow(&req.body, NULL, NULL);
+  // 다중데이터 세팅
+  im_body411_req_set_realnum_data(&req.body, "number", (double)99.999);
+  im_body411_req_set_string_data(&req.body, "string", "hello");
+  im_body411_req_set_int_data(&req.body, "hum", (int)55);
+
+  
+
+
+
+  DBG("trx_id[%lld]", im_head_get_trmTransacId(&req.head));
+
+  rc = im_transact_packet_with_response_handler(cli, &req, on_411_response_arrived);
+  if ( rc < 0 )    {
+    ERR("fail im_transact_packet_with_response_handler()");
+    im_packet_release(&req);
+    return -1;
+  }
+
+  im_packet_release(&req);
+  return 0;
+}
+
