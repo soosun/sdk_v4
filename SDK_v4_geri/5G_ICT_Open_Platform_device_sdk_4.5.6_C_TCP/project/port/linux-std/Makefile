@@ -20,6 +20,7 @@ include $(IM_SDK_HOME)/Makefile.common
 CFLAGS += \
 	-fPIC \
 
+# Rasperry Pi - GPIO Library flg를 추가합니다.
 OFLAGS += -lwiringPi
 
 LIBS += \
